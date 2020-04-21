@@ -15,14 +15,13 @@ from secret import *
 class scrape_Grades():
     def Scrape(self):
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
+        #options.add_argument('--headless')
         options.add_argument('--window-size=1920,4000')
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
-        options.binary_location = r'C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe'
-        driver_path: str = r'D:\Python\webdriver\chromedriver.exe'
-        driver = webdriver.Chrome(options=options, executable_path=driver_path)
+        driver = webdriver.Chrome(options=options)
+        #, executable_path=driver_path)
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"User-Agent": "browserClientA"}})
         print('Open Chrome')
         driver.get("https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=EXTERNALPAGES&ARGUMENTS=-N000000000000001,-N000324,-Awelcome")
