@@ -15,12 +15,12 @@ from secret import *
 class scrape_Grades():
     def Scrape(self):
         options = webdriver.ChromeOptions()
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         options.add_argument('--window-size=1920,4000')
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
-        driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options,executable_path=r'D:\Python\webdriver\chromedriver.exe')
         #, executable_path=driver_path)
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"User-Agent": "browserClientA"}})
         print('Open Chrome')
@@ -34,17 +34,18 @@ class scrape_Grades():
         driver.find_element_by_xpath('//*[@id="link000310"]/a').click()
         time.sleep(2)
         Noten = driver.find_element_by_xpath('//*[@id="contentSpacer_IE"]/div').text
+        CSV = driver.find_element_by_xpath('//*[@id="contentSpacer_IE"]').text
         element = driver.find_element_by_tag_name('body')
         element_png = element.screenshot_as_png
         driver.close()
+        print('Close Chrome')
         with open("D:/Noten.png", "wb") as file:
             file.write(element_png)
             file.close()
         with codecs.open('D:/Noten.txt', 'w') as f:
             f.write(Noten)
             f.close()
-            os.system('D:/Noten.txt')
-
+        print('Files saved')
     def Send_Mail(self):
         img_data = open("D:/Noten.png", 'rb').read()
         port = 465  # For SSL
@@ -53,9 +54,11 @@ class scrape_Grades():
 
 
         # reading the file in binary mode. Because it is saved as a UTF-8 file and there is a error, if you try to convert it to ASCII
+        print('Creating E-Mail')
         r = open('D:/Noten.txt', "r")
         msg = MIMEMultipart()
         msg.attach(MIMEText(r.read()))
+        r.close()
         msg['Subject'] = 'Dualis'
         msg['From'] = sender_email
         msg['To'] = receiver_email
