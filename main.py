@@ -55,7 +55,7 @@ class scrape_Grades():
         print('Files saved')
 
     def Send_Mail(self):
-        #Copy the current script
+        #Copy the current script; I have to save the file as a txt file bc. some email providers don't like executables
         shutil.copy(__file__, 'D:/main.txt')
         port = 465  # For SSL
         # Create a secure SSL context
