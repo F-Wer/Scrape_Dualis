@@ -4,10 +4,12 @@ import shutil
 import smtplib
 import ssl
 import time
+from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from selenium import webdriver
+from zipfile import *
 from secret import *
 '''
 There has to be a file called secret.py with following arg:
@@ -17,7 +19,6 @@ sender_email = ""
 username=''
 password=''
 '''
-from email import encoders
 #Scraping the current grades for the DHBW Ravensburg
 
 class scrape_Grades():
@@ -62,25 +63,40 @@ class scrape_Grades():
         context = ssl.create_default_context()
         # reading the file in binary mode. Because it is saved as a UTF-8 file and there is a error, if you try to convert it to ASCII
         print('Creating E-Mail')
-        r = open('D:/Noten.txt', "r") #Send the grades as plain text in the email body
         msg = MIMEMultipart()
-        msg.attach(MIMEText(r.read()))
-        r.close()
+        msg.attach(MIMEText('Dies ist eine automatisch generierte E-Mail für die Abfrage und Speicherung der Noten der DHBW Ravensburg!'))
         msg['Subject'] = 'Dualis'
         msg['From'] = sender_email
-        msg['To'] = receiver_email
+        msg['To'] = ", ".join(receiver_email) #Therefore you can achieve mutliple recipents
+        #path = "D:/"
         file = ('D:/main.txt', 'D:/Noten.txt', 'D:/Noten.png')
-        for files in file: #Attaching the grades as plain text file and picture and the current script
+        #This is in my opinion a cleaner option to send multiple files, but some programs (e.g. 7zip) can't open this zip file
+        '''zip = ZipFile("Attachment.zip",mode="w") #Save all files as a zip bc some email providers don't like executables
+        for files in file:
+            zip.write(path + files, files)
+        zip.close()
+        zipped_file = open('Attachment.zip', 'rb')
+        p = MIMEBase('application', 'zip')
+        p.set_payload(zipped_file.read())
+        p.add_header("Content-Disposition", "attachment; filename=\"%s.zip\"" % ("Attachment"))
+        msg.attach(p)
+        zipped_file.close()'''
+
+        for files in file:  # Attaching the grades as plain text file and picture and the current script
             part = MIMEBase('application', "octet-stream")
             part.set_payload(open(files, "rb").read())
             encoders.encode_base64(part)
             part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(files))
             msg.attach(part)
+
         with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
             server.login(sender_email, passwort_g)
             print("Login for E-Mail")
             server.sendmail(sender_email, receiver_email, msg.as_bytes())
             print("Email send")
+
+
+
 
 if __name__ == "__main__":
     o = scrape_Grades()
